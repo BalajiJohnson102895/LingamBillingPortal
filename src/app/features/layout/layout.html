@@ -1,0 +1,94 @@
+<div class="app-container">
+    <div class="sidebar" (mouseenter)="toggleCollapsed()" (mouseleave)="toggleCollapsed()"
+        [class.collapsed]="isCollapsed">
+        <ul>
+            <li>
+                <a routerLink="/app/dashboard">
+                    <span class="icon">🏠</span>
+                    <span class="label">Home</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/purchase">
+                    <span class="icon">🛒</span>
+                    <span class="label">Purchase</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/sales">
+                    <span class="icon">💰</span>
+                    <span class="label">Sales</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/stocks">
+                    <span class="icon">📦</span>
+                    <span class="label">Stocks</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/books">
+                    <span class="icon">📚</span>
+                    <span class="label">Books</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/statement-ledgers">
+                    <span class="icon">📄</span>
+                    <span class="label">Statement/Ledgers</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/claims">
+                    <span class="icon">🧾</span>
+                    <span class="label">Claims</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/einvoicing">
+                    <span class="icon">📧</span>
+                    <span class="label">Einvoicing</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/expenses">
+                    <span class="icon">💸</span>
+                    <span class="label">Expenses</span>
+                </a>
+            </li>
+             <li>
+                <a routerLink="/app/masters">
+                    <span class="icon">💸</span>
+                    <span class="label">Masters</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/freezer">
+                    <span class="icon">❄️</span>
+                    <span class="label">Freezer</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/fleet">
+                    <span class="icon">🚚</span>
+                    <span class="label">Fleet</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/staff">
+                    <span class="icon">📊</span>
+                    <span class="label">Staff</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/app/reports">
+                    <span class="icon">📈</span>
+                    <span class="label">Reports</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <router-outlet></router-outlet>
+    </div>
+</div>
