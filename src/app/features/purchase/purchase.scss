@@ -66,3 +66,34 @@
 .purchase-table tbody tr:last-child td {
     border-bottom: none;
 }
+.table-container{
+    overflow-x:auto;
+    margin-top:15px;
+}
+
+.purchase-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+}
+
+.purchase-table th,
+.purchase-table td{
+    border:1px solid #444;
+    text-align:center;
+    padding:6px;
+}
+
+.purchase-table input{
+    width:100%;
+    border:none;
+    outline:none;
+    text-align:center;
+    background:transparent;
+}
+
+.purchase-table thead th{
+    background:#f3f3f3;
+    font-weight:600;
+}
+

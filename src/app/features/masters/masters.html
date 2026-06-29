@@ -1,1 +1,81 @@
-<p>masters works!</p>
+<mat-tab-group>
+  <mat-tab label="Product Master">
+    <div class="master-page">
+
+      <div class="master-header">
+        <h2>Product Master</h2>
+        <div class="header-actions">
+
+          <!-- ✅ (input) calls onSearch() which pushes to searchSubject -->
+          <input type="text" placeholder="Search product..."
+            [(ngModel)]="searchText"
+            (input)="onSearch()">
+
+          <button mat-raised-button class="add-btn" (click)="openProductDialog()">
+            + Add Product
+          </button>
+        </div>
+      </div>
+
+      <table class="master-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Description</th>
+            <!-- ✅ sortByPrice() now just pushes to sortSubject -->
+            <th (click)="sortByPrice()">Price ₹ ↕</th>
+            <th>GST %</th>
+            <th>Case Qty</th>
+            <th>HSN Code</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- ✅ async pipe subscribes to filteredProducts$, handles null while
+               loading, and auto-unsubscribes when component is destroyed.
+               The @else spinner shows automatically before first emit. -->
+          @if (filteredProducts$ | async; as products) {
+            @if (products.length > 0) {
+              @for (product of products; track product.productId) {
+                <tr>
+                  <td>{{ product.productCode }}</td>
+                  <td>{{ product.productDescription }}</td>
+                  <td>{{ product.priceInclGST }}</td>
+                  <td>{{ product.gstPercent }}</td>
+                  <td>{{ product.caseQuantity }}</td>
+                  <td>{{ product.hsnCode }}</td>
+                  <td class="action-cell">
+                    <button mat-icon-button (click)="openProductDialog(product)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="deleteProduct(product.productId)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            } @else {
+              <!-- ✅ Handles empty search results vs loading -->
+              <tr>
+                <td colspan="7" style="text-align:center; padding: 2rem;">
+                  No products found.
+                </td>
+              </tr>
+            }
+          } @else {
+            <!-- Shows while filteredProducts$ hasn't emitted yet (API in flight) -->
+            <tr>
+              <td colspan="7" style="text-align:center; padding: 2rem;">
+                <mat-spinner diameter="32"></mat-spinner>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+    </div>
+  </mat-tab>
+  <mat-tab label="Price Master"></mat-tab>
+  <mat-tab label="Case Qty Master"></mat-tab>
+</mat-tab-group>

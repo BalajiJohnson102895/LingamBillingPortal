@@ -1,54 +1,100 @@
 <section class="purchase-options">
-    <div >
-        <input class="search-input" type="number">
-    </div>
-    <div class="purchase-controls">
-        <button class="style-button">Save</button>
-        <button class="style-button">Delete</button>
-        <input type="date" >
-        <input type="date" >
-        <button>Close</button>
-    </div>
+  <mat-form-field>
+    <mat-label>Name</mat-label>
+    <input matInput>
+  </mat-form-field>
+  <div class="purchase-controls">
+    <button class="style-button">Save</button>
+    <button class="style-button">Delete</button>
+    <input type="date">
+    <input type="date">
+    <button routerLink="/app/dashboard">Close</button>
+  </div>
 </section>
-<div class="table-wrapper">
-    <table class="purchase-table">
-        <thead class="table-head">
-            <tr>
-                <th>
-                    S.No
-                </th>
-                <th>
-                    Item
-                </th>
-                <th>
-                    Description
-                </th>
-                <th>
-                    Quantity
-                </th>
-                <th>
-                    Rate Per Piece
-                </th>
-                <th>
-                    Total Amount
-                </th>
+<mat-accordion>
 
-            </tr>
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Purchase Item Details
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <div class="table-container">
+
+      <table class="purchase-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Sno</th>
+            <th rowspan="2">Item</th>
+            <th rowspan="2">Description</th>
+            <th colspan="2">Quantity</th>
+            <th rowspan="2">GST Percentage</th>
+            <th colspan="2">GST Value</th>
+            <th rowspan="2">Price per Piece<br>(Incl GST)</th>
+            <th rowspan="2">Total</th>
+            <th rowspan="2">Remarks</th>
+          </tr>
+          <tr>
+            <th>Case</th>
+            <th>Piece</th>
+            <th>CGST</th>
+            <th>SGST</th>
+          </tr>
         </thead>
 
         <tbody>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>
+          @for (row of purchaseItems; track $index; let i = $index) {
+          <tr>
+            <td>{{i + 1}}</td>
 
+            <td>
+              <input type="text" [(ngModel)]="row.itemCode" [matAutocomplete]="auto" (focus)="loadProducts()">
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectProduct($event.option.value, row)">
+                @for (product of filteredProducts; track $index) {
+                <mat-option [value]="product">
+                  {{product.itemCode}} - {{product.productName}}
+                </mat-option>
+                }
 
+              </mat-autocomplete>
+            </td>
 
-                </td>
-            </tr>
+            <td>
+              <input type="text" [(ngModel)]="row.description">
+            </td>
+
+            <td><input type="number" [(ngModel)]="row.qtyCase" (input)="calculateRow(row)"></td>
+            <td><input type="number" [(ngModel)]="row.qtyPiece" (input)="calculateRow(row)"></td>
+
+            <td><input type="number" [(ngModel)]="row.gstCgstPercent" readonly></td>
+            <td><input type="number" [(ngModel)]="row.gstSgstPercent" readonly></td>
+
+            <td>{{row.gstCgstValue}}</td>
+            <td>{{row.gstSgstValue}}</td>
+
+            <td><input type="number" [(ngModel)]="row.pricePerPiece" readonly></td>
+
+            <td>{{row.total}}</td>
+
+          </tr>
+          }
+
         </tbody>
-    </table>
-</div>
+      </table>
+
+    </div>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Purchase Summary
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    Coming next...
+
+  </mat-expansion-panel>
+
+</mat-accordion>

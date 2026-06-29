@@ -1,0 +1,40 @@
+.dialog-body{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding-top:12px !important;
+}
+
+.dialog-body mat-form-field{
+    width:100%;
+}
+
+::ng-deep .dialog-body .mat-mdc-form-field-infix{
+    min-height:40px !important;
+    padding-top:10px !important;
+    padding-bottom:10px !important;
+}
+
+::ng-deep .dialog-body .mat-mdc-floating-label{
+    top: 20px !important;
+}
+
+::ng-deep .dialog-body .mdc-notched-outline__notch{
+    border-right:none !important;
+}
+
+.dialog-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:10px;
+}
+
+.save-btn{
+    background: linear-gradient(to right, #43cea2, #185a9d);
+    color:white !important;
+}
+
+::ng-deep .mat-mdc-dialog-content{
+   max-height:none !important;
+}
