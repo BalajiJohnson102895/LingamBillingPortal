@@ -1,51 +1,89 @@
-.master-page{
-    padding:20px;
-    background:#f5f5f5;
-    min-height:100vh;
+.master-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 112px); // ✅ subtract toolbar + tab header height
+  padding: 1.5rem;
+  gap: 1rem;
 }
 
-.master-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
+.master-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0; // ✅ header never shrinks — only table area scrolls
+
+  h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
 }
 
-.header-actions{
-    display:flex;
-    gap:10px;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    width: 220px;
+    outline: none;
+
+    &:focus {
+      border-color: #1976d2;
+    }
+  }
 }
 
-.header-actions input{
-    width:250px;
-    padding:10px;
-    border:1px solid #ccc;
-    border-radius:6px;
+.add-btn {
+  background-color: #00bcd4;
+  color: white;
 }
 
-.add-btn{
-    background: linear-gradient(to right, #4facfe, #00f2fe);
-    color:white !important;
+// ✅ This div is what scrolls — not the page, not the table itself
+.table-container {
+  flex: 1;              // takes remaining height after header
+  overflow-y: auto;     // scroll happens here
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+
+  // ✅ Makes sticky header work inside a scrollable container
+  // Without this, sticky: true on mat-header-row does nothing
+  overflow-anchor: none;
 }
 
-.master-table{
-    width:100%;
-    border-collapse:collapse;
-    background:white;
+.master-table {
+  width: 100%;
+
+  th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #555;
+    background-color: #f5f5f5; // ✅ header needs explicit bg or it shows through rows while scrolling
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  td {
+    font-size: 0.9rem;
+  }
+
+  tr:hover {
+    background-color: #f9f9f9;
+  }
 }
 
-.master-table th,
-.master-table td{
-    border:1px solid #ddd;
-    padding:10px;
-    text-align:left;
+.action-cell {
+  display: flex;
+  gap: 0.25rem;
 }
 
-.master-table th{
-    background:#efefef;
-    cursor:pointer;
-}
-
-::ng-deep .mat-mdc-dialog-content{
-   max-height:none !important;
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
 }

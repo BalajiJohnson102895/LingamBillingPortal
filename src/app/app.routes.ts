@@ -7,7 +7,7 @@ import { Claims } from './features/claims/claims';
 import { Einvoicing } from './features/einvoicing/einvoicing';
 import { Fleet } from './features/fleet/fleet';
 import { Freezer } from './features/freezer/freezer';
-import { Purchase } from './features/purchase/purchase';
+import { PurchaseComponent } from './features/purchase/purchase';
 import { Reports } from './features/reports/reports';
 import { Sales } from './features/sales/sales';
 import { Stocks } from './features/stocks/stocks';
@@ -24,7 +24,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
-      { path: 'purchase', component: Purchase },
+      { path: 'purchase', component: PurchaseComponent },
       { path: 'sales', component: Sales },
       { path: 'stocks', component: Stocks },
       { path: 'books', component: Books },

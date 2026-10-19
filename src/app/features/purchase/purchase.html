@@ -1,100 +1,249 @@
-<section class="purchase-options">
-  <mat-form-field>
-    <mat-label>Name</mat-label>
-    <input matInput>
-  </mat-form-field>
-  <div class="purchase-controls">
-    <button class="style-button">Save</button>
-    <button class="style-button">Delete</button>
-    <input type="date">
-    <input type="date">
-    <button routerLink="/app/dashboard">Close</button>
-  </div>
-</section>
-<mat-accordion>
+<div class="purchase-page">
 
-  <mat-expansion-panel [expanded]="true">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Purchase Item Details
-      </mat-panel-title>
-    </mat-expansion-panel-header>
+  <!-- Top controls bar -->
+  <section class="purchase-controls">
+    <div class="controls-left">
 
-    <div class="table-container">
+      <!-- Supplier is fixed (single-supplier business) — no longer an editable field -->
+      <div class="supplier-badge" title="Supplier">
 
-      <table class="purchase-table">
-        <thead>
-          <tr>
-            <th rowspan="2">Sno</th>
-            <th rowspan="2">Item</th>
-            <th rowspan="2">Description</th>
-            <th colspan="2">Quantity</th>
-            <th rowspan="2">GST Percentage</th>
-            <th colspan="2">GST Value</th>
-            <th rowspan="2">Price per Piece<br>(Incl GST)</th>
-            <th rowspan="2">Total</th>
-            <th rowspan="2">Remarks</th>
-          </tr>
-          <tr>
-            <th>Case</th>
-            <th>Piece</th>
-            <th>CGST</th>
-            <th>SGST</th>
-          </tr>
-        </thead>
+        <img src="Hatsun_agro_pro_logo.png" alt="Supplier Icon" class="supplier-icon" width="150">
+      </div>
 
-        <tbody>
-          @for (row of purchaseItems; track $index; let i = $index) {
-          <tr>
-            <td>{{i + 1}}</td>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="date-field">
+        <mat-label>Date</mat-label>
+        <!-- readonly: date can only be changed via the calendar icon/panel, not typed -->
+        <input matInput readonly
+               [matDatepicker]="purchaseDatePicker"
+               [(ngModel)]="purchaseDate">
+        <mat-datepicker-toggle matSuffix [for]="purchaseDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #purchaseDatePicker></mat-datepicker>
+      </mat-form-field>
 
-            <td>
-              <input type="text" [(ngModel)]="row.itemCode" [matAutocomplete]="auto" (focus)="loadProducts()">
-              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectProduct($event.option.value, row)">
-                @for (product of filteredProducts; track $index) {
-                <mat-option [value]="product">
-                  {{product.itemCode}} - {{product.productName}}
-                </mat-option>
-                }
-
-              </mat-autocomplete>
-            </td>
-
-            <td>
-              <input type="text" [(ngModel)]="row.description">
-            </td>
-
-            <td><input type="number" [(ngModel)]="row.qtyCase" (input)="calculateRow(row)"></td>
-            <td><input type="number" [(ngModel)]="row.qtyPiece" (input)="calculateRow(row)"></td>
-
-            <td><input type="number" [(ngModel)]="row.gstCgstPercent" readonly></td>
-            <td><input type="number" [(ngModel)]="row.gstSgstPercent" readonly></td>
-
-            <td>{{row.gstCgstValue}}</td>
-            <td>{{row.gstSgstValue}}</td>
-
-            <td><input type="number" [(ngModel)]="row.pricePerPiece" readonly></td>
-
-            <td>{{row.total}}</td>
-
-          </tr>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="pur-number-field">
+        <mat-label>Purchase No.</mat-label>
+        <input matInput
+               [(ngModel)]="purchaseNumber"
+               [matAutocomplete]="purchaseNoAuto"
+               (input)="filterPurchaseNumbers(purchaseNumber)"
+               (keyup.enter)="jumpToPurchase()"
+               [placeholder]="currentPurchaseId ? '' : 'Auto-generated'">
+        <mat-autocomplete #purchaseNoAuto="matAutocomplete" autoActiveFirstOption
+                           (optionSelected)="onPurchaseNumberSelected($event.option.value)">
+          @for (num of filteredPurchaseNumbers; track num) {
+            <mat-option [value]="num">{{ num }}</mat-option>
           }
-
-        </tbody>
-      </table>
-
+        </mat-autocomplete>
+      </mat-form-field>
     </div>
-  </mat-expansion-panel>
 
-  <mat-expansion-panel>
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Purchase Summary
-      </mat-panel-title>
-    </mat-expansion-panel-header>
+    <div class="controls-right">
+      <button mat-raised-button color="primary" (click)="savePurchase()">
+        <mat-icon>save</mat-icon> Save
+      </button>
+      <button mat-raised-button (click)="newPurchase()">
+        <mat-icon>add</mat-icon> New
+      </button>
+      <button mat-raised-button color="warn"
+              [disabled]="!currentPurchaseId" (click)="deletePurchase()">
+        <mat-icon>delete</mat-icon> Delete
+      </button>
+      <button mat-raised-button routerLink="/app/dashboard">
+        <mat-icon>close</mat-icon> Close
+      </button>
+    </div>
+  </section>
 
-    Coming next...
+  <!-- Tabs -->
+  <mat-tab-group [(selectedIndex)]="activeTabIndex" class="purchase-tabs">
 
-  </mat-expansion-panel>
+    <!-- Tab 1: Purchase Entry -->
+    <mat-tab label="Purchase Entry">
+      <div class="tab-content">
 
-</mat-accordion>
+        <div class="table-container">
+          <table mat-table [dataSource]="dataSource" class="purchase-table">
+
+            <!-- Sno -->
+            <ng-container matColumnDef="sno">
+              <th mat-header-cell *matHeaderCellDef>#</th>
+              <td mat-cell *matCellDef="let row; let i = index">{{ i + 1 }}</td>
+            </ng-container>
+
+            <!-- Product Code with autocomplete -->
+            <ng-container matColumnDef="productCode">
+              <th mat-header-cell *matHeaderCellDef>Code</th>
+              <td mat-cell *matCellDef="let row; let i = index">
+                <input #codeInput class="cell-input"
+                  [(ngModel)]="row.productCode"
+                  [matAutocomplete]="codeAuto"
+                  (input)="filterByCode(row.productCode, i)">
+                <mat-autocomplete #codeAuto="matAutocomplete" autoActiveFirstOption
+                  (optionSelected)="selectProduct($event.option.value, row, i)">
+                  @for (p of filteredByCode.get(i) ?? []; track p.productId) {
+                    <mat-option [value]="p">
+                      {{ p.productCode }} — {{ p.productDescription }}
+                    </mat-option>
+                  }
+                </mat-autocomplete>
+              </td>
+            </ng-container>
+
+            <!-- Description with autocomplete -->
+            <ng-container matColumnDef="productDescription">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let row; let i = index">
+                <input class="cell-input wide"
+                  [(ngModel)]="row.productDescription"
+                  [matAutocomplete]="descAuto"
+                  (input)="filterByDesc(row.productDescription, i)">
+                <mat-autocomplete #descAuto="matAutocomplete" autoActiveFirstOption
+                  (optionSelected)="selectProduct($event.option.value, row, i)">
+                  @for (p of filteredByDesc.get(i) ?? []; track p.productId) {
+                    <mat-option [value]="p">
+                      {{ p.productDescription }}
+                    </mat-option>
+                  }
+                </mat-autocomplete>
+              </td>
+            </ng-container>
+
+            <!-- Qty Case -->
+            <ng-container matColumnDef="qtyCase">
+              <th mat-header-cell *matHeaderCellDef>Case</th>
+              <td mat-cell *matCellDef="let row; let i = index">
+                <input #caseInput class="cell-input narrow" type="number" min="0"
+                  [(ngModel)]="row.qtyCase" (input)="calculateRow(row)"
+                  (keyup.enter)="onCaseEnter(i)">
+              </td>
+            </ng-container>
+
+            <!-- Qty Piece -->
+            <ng-container matColumnDef="qtyPiece">
+              <th mat-header-cell *matHeaderCellDef>Piece</th>
+              <td mat-cell *matCellDef="let row; let i = index">
+                <input class="cell-input narrow" type="number" min="0"
+                  [(ngModel)]="row.qtyPiece" (input)="calculateRow(row)"
+                  (keyup.enter)="focusNextRowCode(i)">
+              </td>
+            </ng-container>
+
+            <!-- Total Pieces (readonly) -->
+            <ng-container matColumnDef="totalPieces">
+              <th mat-header-cell *matHeaderCellDef>Total Pcs</th>
+              <td mat-cell *matCellDef="let row">{{ row.totalPieces }}</td>
+            </ng-container>
+
+            <!-- GST % -->
+            <ng-container matColumnDef="gstPercent">
+              <th mat-header-cell *matHeaderCellDef>GST %</th>
+              <td mat-cell *matCellDef="let row">{{ row.gstPercent }}</td>
+            </ng-container>
+
+            <!-- CGST -->
+            <ng-container matColumnDef="cgstValue">
+              <th mat-header-cell *matHeaderCellDef>CGST</th>
+              <td mat-cell *matCellDef="let row">{{ row.cgstValue }}</td>
+            </ng-container>
+
+            <!-- SGST -->
+            <ng-container matColumnDef="sgstValue">
+              <th mat-header-cell *matHeaderCellDef>SGST</th>
+              <td mat-cell *matCellDef="let row">{{ row.sgstValue }}</td>
+            </ng-container>
+
+            <!-- Price -->
+            <ng-container matColumnDef="pricePerPiece">
+              <th mat-header-cell *matHeaderCellDef>Price ₹</th>
+              <td mat-cell *matCellDef="let row">{{ row.pricePerPiece }}</td>
+            </ng-container>
+
+            <!-- Total -->
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef>Total ₹</th>
+              <td mat-cell *matCellDef="let row">{{ row.total }}</td>
+            </ng-container>
+
+            <!-- Remarks -->
+            <ng-container matColumnDef="remarks">
+              <th mat-header-cell *matHeaderCellDef>Remarks</th>
+              <td mat-cell *matCellDef="let row">
+                <input class="cell-input wide" [(ngModel)]="row.remarks">
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          </table>
+        </div>
+
+        <!-- Totals footer -->
+        <div class="purchase-footer">
+          <span>Total GST: <strong>₹{{ grandGST }}</strong></span>
+          <span>Net Amount: <strong>₹{{ grandTotal }}</strong></span>
+        </div>
+
+      </div>
+    </mat-tab>
+
+    <!-- Tab 2: Purchase Summary -->
+    <mat-tab label="Purchase Summary">
+      <div class="tab-content summary-tab">
+
+        <div class="calendar-panel">
+          <mat-calendar
+            [(selected)]="selectedDate"
+            (selectedChange)="onDateSelected($event)"
+            (monthSelected)="onMonthChanged($event)"
+            [dateClass]="dateClass">
+          </mat-calendar>
+        </div>
+
+        <div class="summary-panel">
+          <h3>
+            Purchases on
+            {{ selectedDate | date:'dd MMM yyyy' }}
+          </h3>
+
+          @if (purchasesOnDate.length > 0) {
+            <table mat-table [dataSource]="purchasesOnDate" class="summary-table">
+
+              <ng-container matColumnDef="purchaseNumber">
+                <th mat-header-cell *matHeaderCellDef>Purchase No.</th>
+                <td mat-cell *matCellDef="let p">{{ p.purchaseNumber }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="supplierName">
+                <th mat-header-cell *matHeaderCellDef>Supplier</th>
+                <td mat-cell *matCellDef="let p">{{ p.supplierName }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="netAmount">
+                <th mat-header-cell *matHeaderCellDef>Net Amount</th>
+                <td mat-cell *matCellDef="let p">₹{{ p.netAmount }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="open">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let p">
+                  <button mat-stroked-button (click)="loadPurchaseFromSummary(p)">
+                    Open
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="['purchaseNumber','supplierName','netAmount','open']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['purchaseNumber','supplierName','netAmount','open'];"></tr>
+
+            </table>
+          } @else {
+            <p class="no-data">No purchases on this date.</p>
+          }
+        </div>
+
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

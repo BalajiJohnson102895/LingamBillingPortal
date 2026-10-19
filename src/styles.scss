@@ -4,6 +4,45 @@
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+// Poppins — all standard weights
+
+@use  '@fontsource/poppins/300.css' as *;
+@use  '@fontsource/poppins/400.css' as *;
+@use  '@fontsource/poppins/500.css' as *;
+@use  '@fontsource/poppins/600.css' as *;
+
+
+// Roboto (Angular Material's default UI font)
+@use '@fontsource/roboto/300.css' as * ;
+@use   '@fontsource/roboto/400.css' as *;
+@use '@fontsource/roboto/500.css' as *;
+@use '@fontsource/roboto/700.css' as *  ;
+
+// Material Icons font (self-hosted)
+@use '@fontsource/material-icons' as *;
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+
+  font-feature-settings: 'liga';
+}
+
+body {
+  font-family: 'Poppins', 'Roboto', sans-serif;
+}
 
 html {
   height: 100%;
@@ -13,10 +52,37 @@ html {
         primary: mat.$cyan-palette,
         tertiary: mat.$orange-palette,
       ),
-      typography: Roboto,
+      typography: Poppins,
       density: 0,
     )
   );
+}
+
+input, textarea, select, button {
+  font-family: inherit;
+}
+.cdk-overlay-container
+  .mat-mdc-snack-bar-container.snack-success
+  .mat-mdc-snackbar-surface {
+  background: #2E7D32 !important;
+}
+
+.cdk-overlay-container
+  .mat-mdc-snack-bar-container.snack-warning
+  .mat-mdc-snackbar-surface {
+  background: #F57C00 !important;
+}
+
+.cdk-overlay-container
+  .mat-mdc-snack-bar-container.snack-error
+  .mat-mdc-snackbar-surface {
+  background: #D32F2F !important;
+}
+
+.cdk-overlay-container
+  .mat-mdc-snack-bar-container
+  .mat-mdc-button {
+  color: white !important;
 }
 
 body {
@@ -45,4 +111,7 @@ body {
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+.cdk-overlay-pane{
+  width: max-content !important;
 }
